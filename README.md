@@ -17,7 +17,47 @@ olarak aynı sayfada yaşar. Ayrıntılı tasarım brief'i için: [`DESIGN.md`](
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # üretim derlemesi (tamamen statik)
+npm run build    # üretim derlemesi → out/ (statik export)
+```
+
+## Yayın (Nginx + Cloudflare Flexible)
+
+`output: "export"` ile `npm run build` çıktıyı `out/` klasörüne yazar. Node/PM2 gerekmez.
+
+```bash
+npm ci
+npm run build
+# Nginx root'u out/'a ver, veya:
+# rsync -a --delete out/ /var/www/kaantanis/
+```
+
+Cloudflare SSL mode: **Flexible** → origin yalnızca HTTP (80). Nginx örneği:
+
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name kaantanis.com www.kaantanis.com;
+
+    root /var/www/kaantanis-v3/out;
+    index index.html;
+
+    location /_next/static/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?)$ {
+        expires 7d;
+        add_header Cache-Control "public";
+        try_files $uri =404;
+    }
+
+    location / {
+        try_files $uri $uri/ $uri.html /index.html;
+    }
+}
 ```
 
 ## Mimari notlar
