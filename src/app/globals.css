@@ -1,26 +1,221 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-bone: #f0ede6;
+  --color-bone-dim: #e6e2d8;
+  --color-ink: #131316;
+  --color-carbon: #0f0f13;
+  --color-carbon-2: #16161c;
+  --color-amber: #ffb300;
+  --color-ultra: #2418ee;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-bricolage);
+  --font-serifit: var(--font-instrument);
+  --font-mono: var(--font-jetbrains);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-ink) 40%, transparent) transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bone);
+  color: var(--color-ink);
+  font-family: var(--font-display), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-amber);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring, var(--color-ultra));
+  outline-offset: 3px;
+}
+
+.zone-dark {
+  --focus-ring: var(--color-amber);
+}
+
+/* ---------- utility: mono etiket (küçük harf sistemin sesi) ---------- */
+.mono-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+}
+
+/* ---------- kontur (outline) tipografi ---------- */
+.stroke-amber {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--color-amber);
+  paint-order: stroke fill;
+}
+.stroke-ink {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--color-ink);
+  paint-order: stroke fill;
+}
+.stroke-bone {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--color-bone);
+  paint-order: stroke fill;
+}
+.no-stroke {
+  -webkit-text-stroke: 0 !important;
+}
+
+/* ---------- hero seam ---------- */
+.seam-clip {
+  clip-path: polygon(
+    calc(var(--seam) + var(--tilt)) -2%,
+    102% -2%,
+    102% 102%,
+    calc(var(--seam) - var(--tilt)) 102%
+  );
+  will-change: clip-path;
+}
+
+/* ---------- doku: grain + scanline ---------- */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 95;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 0.9s steps(4) infinite;
+}
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-1.2%, 0.8%); }
+  50% { transform: translate(0.9%, -1.1%); }
+  75% { transform: translate(-0.6%, -0.7%); }
+  100% { transform: translate(0, 0); }
+}
+
+.scanlines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    rgba(240, 237, 230, 0.025) 2px 3px
+  );
+}
+
+.dot-grid {
+  background-image: radial-gradient(
+    circle,
+    rgba(240, 237, 230, 0.14) 1px,
+    transparent 1px
+  );
+  background-size: 26px 26px;
+}
+
+.blueprint-grid {
+  background-image:
+    linear-gradient(to right, rgba(36, 24, 238, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(36, 24, 238, 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* ultramarin zemin üzerinde kemik çizgili gerçek "blueprint" dokusu */
+.blueprint-grid-bone {
+  background-image:
+    linear-gradient(to right, rgba(240, 237, 230, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(240, 237, 230, 0.07) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* ---------- diyagonal bölüm girişi (hero dikişinin yankısı) ---------- */
+.diag-top {
+  clip-path: polygon(0 3vw, 100% 0, 100% 100%, 0 100%);
+  margin-top: -3vw;
+}
+
+/* ---------- marquee ---------- */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-dur, 26s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- terminal caret ---------- */
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 0.15em;
+  vertical-align: text-bottom;
+  background: var(--color-amber);
+  animation: caret-blink 1.05s steps(1) infinite;
+}
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+
+/* ---------- highlight marker (manifesto, ultra zemin üzerinde) ---------- */
+.mark-amber {
+  background: var(--color-amber);
+  color: var(--color-ink);
+  padding: 0 0.18em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  font-weight: 600;
+}
+
+/* ---------- form ---------- */
+.field {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
+  border-radius: 0;
+  padding: 0.7rem 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.05rem;
+  color: var(--color-ink);
+  transition: border-color 0.25s ease;
+}
+.field::placeholder {
+  color: color-mix(in srgb, var(--color-ink) 35%, transparent);
+}
+.field:focus {
+  outline: none;
+  border-bottom-color: var(--color-ultra);
+}
+
+.chip {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);
+  color: var(--color-ink);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+.chip:hover {
+  border-color: var(--color-ink);
+}
+.chip[data-on="true"] {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bone);
 }

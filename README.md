@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# kaantanis.com — v3
 
-## Getting Started
+Kişisel site, üçüncü baskı. Konsept: **"Aynı içerik, iki dil"** — tasarımcı ve
+developer kimliği, hero'daki canlı diyagonal dikişle (seam) ayrılan iki dünya
+olarak aynı sayfada yaşar. Ayrıntılı tasarım brief'i için: [`DESIGN.md`](./DESIGN.md)
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, statik çıktı) + **React 19** + **TypeScript**
+- **Tailwind CSS v4** (`@theme` tokenları) + el yazımı CSS (dikiş, grain, marquee)
+- **GSAP 3.15** — dikiş inertia (`quickTo`), SplitText reveal, ScrollTrigger yatay pin
+- **Motion (Framer Motion) 13** — mikro etkileşimler, form/terminal geçişleri, custom cursor
+- **Lenis** — smooth scroll (GSAP ticker'a bağlı)
+
+## Geliştirme
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # üretim derlemesi (tamamen statik)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Mimari notlar
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `src/components/Hero.tsx` — imza öğe: iki katman + `--seam` CSS değişkeniyle
+  kırpılan clip-path. Fare X'i, dokunmatik sürükleme ve ok tuşları aynı
+  `quickTo` hedefini besler; mobilde dikiş sürekli salınır. Preloader da bu
+  bileşende yaşar (oturum başına bir kez, `sessionStorage`). Çıkışta `&`
+  harfinin kendisi büyür: glif Instrument Serif Italic'ten SVG path'e
+  çıkarıldı (`src/lib/amp-glyph.ts`), tam ekran SVG'nin `viewBox`'ı satır
+  içindeki yuvadan glifin kalın gövdesinin içine geometrik interpolasyonla
+  tween'lenir — vektör her karede yeniden çizildiği için harf her ölçekte
+  keskindir. Mürekkep ekranı kaplayınca beyaz `DESIGNER` belirir ve ultra
+  zeminli manifestoya kesintisiz bağlanır.
+- `src/components/Stack.tsx` — sahte terminal; kategori komutları `ls ~/stack/...`
+  yazıp listeyi basar. İlk komut ScrollTrigger ile görünür olunca çalışır.
+- `src/components/Process.tsx` — masaüstünde ScrollTrigger pinli yatay şerit,
+  mobilde yapışkan kart destesi: sonraki panel üstüne kayarken alttaki küçülüp
+  kararır, numaralar paralaks yapar (`gsap.matchMedia`).
+- `src/components/Contact.tsx` — form backend'siz çalışır: mesajı derleyip
+  `wa.me` (WhatsApp) veya `mailto:` derin bağlantısına dönüştürür.
+  İleride gerçek endpoint istenirse `onSubmit` içindeki `window.open`
+  bir `fetch("/api/contact")` ile değiştirilebilir.
+- Efektler `prefers-reduced-motion` dahil her tercihte aktiftir (bilinçli
+  tercih — hareket deneyimin kendisi).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Erişilebilirlik
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Dikiş tutamacı gerçek bir `role="slider"` — ok tuşlarıyla kullanılabilir.
+- Çift katmanlı hero'nun kopya katmanı `aria-hidden`; ekran okuyucu tek içerik duyar.
+- Fokus halkaları: bone zeminde ultramarin, karbon zeminde amber.
