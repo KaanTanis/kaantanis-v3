@@ -14,6 +14,10 @@ const SEAM_REST = 56;
    genişliğine oranı (ne kadar küçükse o kadar derine dalınır). */
 const TARGET = { fx: 0.0635, fy: 0.731, size: 0.02 };
 
+/* Büyüme sırasında harfin kazandığı ek kalınlık (glif birimi):
+   aynı renkli stroke konturu şişirir, harf git gide koyulaşıp dolgunlaşır */
+const AMP_BOLD = 80;
+
 /* Satır içi &: metin glifiyle birebir aynı path — font yüklenme
    farkları olmadan her ölçekte keskin, katman rengini class'tan alır. */
 function AmpGlyph({ dev }: { dev: boolean }) {
@@ -289,6 +293,7 @@ export default function Hero() {
         fyv: 0.5,
         endW: AMP_W * TARGET.size,
       };
+      const ampPath = ampSvgRef.current?.querySelector("path") ?? null;
 
       const applyCam = () => {
         const svgEl = ampSvgRef.current;
@@ -300,6 +305,12 @@ export default function Hero() {
         const x = view.tx - view.fxv * w;
         const y = view.ty - view.fyv * h;
         svgEl.setAttribute("viewBox", `${x} ${y} ${w} ${h}`);
+        /* harf büyürken gerçekten kalınlaşır: aynı renk stroke, konturu
+           her iki yöne şişirir — büyümenin ilk %60'ında tam kalınlığa ulaşır */
+        if (ampPath) {
+          const bold = AMP_BOLD * Math.min(1, cam.p * 1.6);
+          ampPath.setAttribute("stroke-width", String(bold));
+        }
       };
 
       const measure = () => {
@@ -464,16 +475,22 @@ export default function Hero() {
         viewBox={`${AMP.bbox.x1} ${AMP.bbox.y1} ${AMP_W} ${AMP_H}`}
         preserveAspectRatio="none"
       >
-        <path d={AMP.path} />
+        <path
+          d={AMP.path}
+          className="stroke-ultra"
+          strokeWidth="0"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
       </svg>
 
-      {/* mavinin içinde beliren kimlik */}
+      {/* mavinin içinde beliren kimlik — manifesto başlığının italik serif sesi */}
       <p
         ref={designerRef}
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[45] flex items-center justify-center font-display text-[clamp(2.6rem,9vw,8.5rem)] font-extrabold tracking-[-0.03em] text-bone"
+        className="pointer-events-none absolute inset-0 z-[45] flex items-center justify-center font-serifit text-[clamp(3.2rem,11vw,9.5rem)] italic leading-none text-bone"
       >
-        DESIGNER
+        designer.
       </p>
 
       {/* preloader */}

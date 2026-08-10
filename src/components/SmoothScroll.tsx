@@ -12,7 +12,13 @@ export default function SmoothScroll({
   useEffect(() => {
     const lenis = new Lenis({
       lerp: 0.115,
-      anchors: true,
+      /* menü tıklamaları hedefe yavaşça süzülür; yol üstündeki
+         pinli sahneler (dikiş, & büyümesi, süreç) izlenebilir kalır */
+      anchors: {
+        duration: 2,
+        easing: (t: number) =>
+          t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+      },
       autoRaf: false,
     });
     // konsoldan erişim (debug + meraklısı için)

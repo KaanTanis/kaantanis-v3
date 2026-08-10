@@ -114,29 +114,10 @@ export default function Contact() {
               variants={fadeUp}
               className="mt-6 max-w-[44ch] text-lg leading-relaxed text-ink/70"
             >
-              Fikir aşamasında olsa bile yaz. Netleştirmek benim işim —{" "}
-              <strong className="font-semibold text-ink">
-                24 saat içinde dönerim.
-              </strong>
+              Fikir aşamasında olsa bile yaz. Netleştirmek benim işim.
             </motion.p>
 
-            <motion.dl variants={fadeUp} className="mt-12">
-              {[
-                ["ilk dönüş", "24 saat"],
-                ["yanıt oranı", "%100"],
-                ["değerlendirme", "5.0 ★"],
-              ].map(([k, v]) => (
-                <div
-                  key={k}
-                  className="mono-label flex items-center justify-between border-t border-ink/15 py-4"
-                >
-                  <dt className="text-ink/50">{k}</dt>
-                  <dd className="text-ink">{v}</dd>
-                </div>
-              ))}
-            </motion.dl>
-
-            <motion.ul variants={fadeUp} className="mt-10 space-y-3">
+            <motion.ul variants={fadeUp} className="mt-12 space-y-3">
               {[
                 ["e-posta", `mailto:${MAIL}`, MAIL],
                 ["whatsapp", `https://wa.me/${PHONE}`, "+90 544 237 3323"],
